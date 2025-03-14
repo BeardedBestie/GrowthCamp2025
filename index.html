@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>X Growth Rankings</title>
+    <style>
+        :root {
+            --bg-primary: #121212;
+            --bg-secondary: #1e1e1e;
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+            --accent: #1DA1F2;
+            --gold: #FFD700;
+            --silver: #C0C0C0;
+            --bronze: #CD7F32;
+            --highlight: #2a2a2a;
+            --card-bg: #1e1e1e;
+            --card-border: #333333;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .container {
+            width: 100%;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: var(--bg-secondary);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            color: var(--accent);
+        }
+        
+        .header-info {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+        
+        .date-info {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        .rankings {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+        
+        .ranking-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--card-border);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .ranking-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .top-10 {
+            background-color: var(--highlight);
+            border: 1px solid var(--accent);
+        }
+        
+        .rank {
+            font-size: 1.5rem;
+            font-weight: bold;
+            min-width: 50px;
+            text-align: center;
+        }
+        
+        .medal {
+            font-size: 1.5rem;
+            margin-right: 10px;
+        }
+        
+        .username {
+            font-weight: bold;
+            margin-right: 15px;
+            flex: 1;
+            color: var(--accent);
+            text-decoration: none;
+        }
+        
+        .username:hover {
+            text-decoration: underline;
+        }
+        
+        .growth {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-left: auto;
+        }
+        
+        .positive {
+            color: #4caf50;
+        }
+        
+        .negative {
+            color: #f44336;
+        }
+        
+        .zero {
+            color: var(--text-secondary);
+        }
+        
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            padding: 20px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--card-border);
+        }
+        
+        .footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+        
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0 30px;
+            padding: 15px;
+            background-color: var(--bg-secondary);
+            border-radius: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .stat {
+            text-align: center;
+            padding: 10px;
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--accent);
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        @media (max-width: 768px) {
+            .ranking-card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .rank {
+                min-width: auto;
+                margin-right: 10px;
+            }
+            
+            .growth {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📈 X Growth Rankings</h1>
+            <div class="header-info">Tracking follower growth over time</div>
+            <div class="date-info">Last updated: <span id="update-date">Loading...</span></div>
+        </header>
+        
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-value" id="total-accounts">0</div>
+                <div class="stat-label">Tracked Accounts</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="top-growth">0</div>
+                <div class="stat-label">Top Growth</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="avg-growth">0</div>
+                <div class="stat-label">Average Growth</div>
+            </div>
+        </div>
+        
+        <div id="rankings" class="rankings">
+            <div class="loading">Loading rankings data...</div>
+        </div>
+        
+        <div class="footer">
+            <p>Free tool sponsored by <a href="https://x.com/BeardedBestie" target="_blank">Grant Walker (@BeardedBestie)</a></p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            loadRankings();
+        });
+
+        async function loadRankings() {
+            try {
+                const response = await fetch('rankings.csv');
+                const data = await response.text();
+                const { accounts, lastUpdated } = parseCSV(data);
+                displayRankings(accounts);
+                updateStats(accounts);
+                
+                // Update the last updated date
+                document.getElementById('update-date').textContent = lastUpdated;
+            } catch (error) {
+                console.error('Error loading rankings:', error);
+                document.getElementById('rankings').innerHTML = `
+                    <div class="loading">
+                        Error loading rankings data. Please make sure rankings.csv is in the same directory.
+                    </div>
+                `;
+            }
+        }
+
+        function parseCSV(csv) {
+            const lines = csv.split('\n');
+            const accounts = [];
+            
+            // Find the data header row (contains "Name" in first column)
+            let headerIndex = 0;
+            for (let i = 0; i < lines.length; i++) {
+                if (lines[i].includes('Name,')) {
+                    headerIndex = i;
+                    break;
+                }
+            }
+            
+            // Get date from the date row (line after header)
+            const dateRow = lines[headerIndex + 1];
+            const dateColumns = dateRow.split(',');
+            let lastUpdated = "Unknown";
+            
+            // Try to find the most recent date with data
+            for (let i = dateColumns.length - 1; i >= 0; i--) {
+                if (dateColumns[i] && dateColumns[i].match(/\d+\/\d+\/\d+/)) {
+                    lastUpdated = dateColumns[i];
+                    break;
+                }
+            }
+            
+            // Find the total column index
+            const totalColumnIndex = lines[headerIndex].split(',').findIndex(col => col.trim() === 'Total');
+            
+            // Skip empty rows and headers
+            for (let i = headerIndex + 2; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line || line.startsWith(',')) continue;
+                
+                const columns = line.split(',');
+                
+                // Skip if doesn't have enough columns or username is empty
+                if (columns.length < totalColumnIndex || !columns[0]) continue;
+                
+                const username = columns[0].trim();
+                
+                // Skip if username doesn't start with @
+                if (!username.startsWith('@')) continue;
+                
+                // Get total growth, handling possible formatting issues
+                let totalGrowth = columns[totalColumnIndex];
+                if (!totalGrowth) continue; // Skip if no total growth data
+                
+                // Remove quotes and commas from the number
+                totalGrowth = totalGrowth.replace(/[",]/g, '');
+                
+                // Convert to number, skip if NaN
+                const growth = parseFloat(totalGrowth);
+                if (isNaN(growth)) continue;
+                
+                accounts.push({
+                    username,
+                    growth
+                });
+            }
+            
+            // Sort by growth (highest to lowest)
+            accounts.sort((a, b) => b.growth - a.growth);
+            
+            return { accounts, lastUpdated };
+        }
+
+        function displayRankings(accounts) {
+            const rankingsElement = document.getElementById('rankings');
+            
+            if (accounts.length === 0) {
+                rankingsElement.innerHTML = `
+                    <div class="loading">
+                        No valid accounts found in the CSV file.
+                    </div>
+                `;
+                return;
+            }
+            
+            let rankingsHTML = '';
+            
+            accounts.forEach((account, index) => {
+                const rank = index + 1;
+                const isTop10 = rank <= 10;
+                
+                let medalEmoji = '';
+                if (rank === 1) {
+                    medalEmoji = '💎'; // Diamond for 1st
+                } else if (rank === 2) {
+                    medalEmoji = '🥇'; // Gold for 2nd
+                } else if (rank === 3) {
+                    medalEmoji = '🥈'; // Silver for 3rd
+                }
+                
+                const growthClass = account.growth > 0 ? 'positive' : (account.growth < 0 ? 'negative' : 'zero');
+                
+                rankingsHTML += `
+                    <div class="ranking-card ${isTop10 ? 'top-10' : ''}">
+                        <div class="rank">${rank}</div>
+                        ${medalEmoji ? `<div class="medal">${medalEmoji}</div>` : ''}
+                        <a href="https://x.com/${account.username.substring(1)}" target="_blank" class="username">${account.username}</a>
+                        <div class="growth ${growthClass}">${account.growth > 0 ? '+' : ''}${account.growth.toLocaleString()}</div>
+                    </div>
+                `;
+            });
+            
+            rankingsElement.innerHTML = rankingsHTML;
+        }
+
+        function updateStats(accounts) {
+            const totalAccounts = accounts.length;
+            const topGrowth = accounts.length > 0 ? accounts[0].growth : 0;
+            
+            // Calculate average growth
+            let totalGrowth = 0;
+            accounts.forEach(account => {
+                totalGrowth += account.growth;
+            });
+            const avgGrowth = totalAccounts > 0 ? (totalGrowth / totalAccounts).toFixed(1) : 0;
+            
+            document.getElementById('total-accounts').textContent = totalAccounts;
+            document.getElementById('top-growth').textContent = topGrowth > 0 ? `+${topGrowth.toLocaleString()}` : topGrowth.toLocaleString();
+            document.getElementById('avg-growth').textContent = avgGrowth > 0 ? `+${avgGrowth}` : avgGrowth;
+        }
+    </script>
+</body>
+</html>
